@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#764ba2">
+    <title>Dashboard - English Learning</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="dark-mode.css">
+    <link rel="stylesheet" href="multi-language.css">
+    <link rel="stylesheet" href="audio-controls.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+        }
+        .sidebar {
+            width: 250px;
+            background: var(--surface, white);
+            padding: 20px;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+        .logo { font-size: 24px; font-weight: bold; color: var(--primary, #764ba2); margin-bottom: 40px; }
+        .menu-item {
+            padding: 15px;
+            margin: 5px 0;
+            cursor: pointer;
+            border-radius: 8px;
+            color: var(--text, #555);
+            transition: 0.3s;
+        }
+        .menu-item:hover, .menu-item.active {
+            background: var(--primary, #764ba2);
+            color: white;
+        }
+        .logout-btn {
+            margin-top: auto;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .main-content {
+            flex: 1;
+            padding: 40px;            overflow-y: auto;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            background: var(--surface, white);
+            padding: 20px;
+            border-radius: 15px;
+        }
+        .welcome-text h1 { margin: 0; color: var(--text, #333); }
+        .progress-container {
+            background: var(--surface, white);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: #eee;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        .progress-fill {
+            height: 100%;
+            width: 15%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 5px;
+        }
+        .lesson-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        .lesson-card {
+            background: var(--surface, white);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.3s;
+            border: 2px solid transparent;
+        }
+        .lesson-card:hover { transform: translateY(-5px); }
+        .lesson-card.completed { border-color: #27ae60; }
+        .lesson-card.current { border-color: #764ba2; }
+        .lesson-card.locked { opacity: 0.6; cursor: not-allowed; }
+        .lesson-icon { font-size: 40px; margin-bottom: 10px; }        .lesson-title { font-weight: bold; color: var(--text, #333); }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">🎓 EngLearn</div>
+        <div class="menu-item active" onclick="window.location.href='dashboard.html'">🏠 Home</div>
+        <div class="menu-item" onclick="window.location.href='lesson.html'">📖 Lessons</div>
+        <div class="menu-item" onclick="window.location.href='profile.html'">👤 Profile</div>
+        <div class="menu-item" onclick="window.location.href='leaderboard.html'">🏆 Leaderboard</div>
+        <div class="menu-item" onclick="window.location.href='certificate.html'">📜 Certificates</div>
+        <div class="menu-item" onclick="window.location.href='notifications.html'">🔔 Notifications</div>
+        <div class="menu-item" onclick="window.location.href='analytics.html'">📊 Analytics</div>
+        <button class="logout-btn" onclick="logout()">🚪 Logout</button>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <div class="welcome-text">
+                <h1 id="welcomeName">Hello, Student!</h1>
+                <p>Ready to continue your journey?</p>
+            </div>
+            <div style="font-size: 24px;">🔥 <span id="streakDisplay">0</span> Day Streak</div>
+        </div>
+
+        <div class="progress-container">
+            <div style="display:flex; justify-content:space-between;">
+                <span>Level 1 Progress</span>
+                <span>15%</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill"></div>
+            </div>
+        </div>
+
+        <h2 style="color: var(--text, #333); margin-bottom: 20px;">📚 Level 1: Foundation</h2>
+        <div class="lesson-grid">
+            <div class="lesson-card completed" onclick="window.location.href='lesson.html'">
+                <div class="lesson-icon">✅</div>
+                <div class="lesson-title">1.1 Alphabet</div>
+                <div style="color: #27ae60; font-size: 12px;">Completed</div>
+            </div>
+            <div class="lesson-card current" onclick="window.location.href='lesson.html'">
+                <div class="lesson-icon">📖</div>
+                <div class="lesson-title">1.2 Basic Words</div>
+                <div style="color: #764ba2; font-size: 12px;">Current</div>
+            </div>
+            <div class="lesson-card locked">
+                <div class="lesson-icon">🔒</div>
+                <div class="lesson-title">1.3 Sentences</div>                <div style="color: #999; font-size: 12px;">Locked</div>
+            </div>
+            <div class="lesson-card locked">
+                <div class="lesson-icon">🔒</div>
+                <div class="lesson-title">1.4 Quiz</div>
+                <div style="color: #999; font-size: 12px;">Locked</div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { auth, db, doc, getDoc, signOut } from './firebase-config.js';
+        import { initAudio, playSFX } from './audio-service.js';
+
+        initAudio();
+
+        auth.onAuthStateChanged(async (user) => {
+            if (!user) {
+                window.location.href = "index.html";
+                return;
+            }
+            
+            const userDoc = await getDoc(doc(db, "users", user.uid));
+            if (userDoc.exists()) {
+                const userData = userDoc.data();
+                document.getElementById("welcomeName").innerText = "Hello, " + (userData.username || "Student") + "!";
+                document.getElementById("streakDisplay").innerText = userData.streak || 0;
+            }
+        });
+
+        window.logout = async function() {
+            await signOut(auth);
+            window.location.href = "index.html";
+        };
+
+        // Add sound effects
+        document.querySelectorAll('.menu-item, .lesson-card').forEach(el => {
+            el.addEventListener('click', () => playSFX('click'));
+            el.addEventListener('mouseenter', () => playSFX('hover'));
+        });
+    </script>
+</body>
+</html>

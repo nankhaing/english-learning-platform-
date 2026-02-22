@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications - English Learning</title>
+    <style>
+        :root {
+            --primary: #764ba2;
+            --secondary: #667eea;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --error: #e74c3c;
+            --light: #f4f7f6;
+            --dark: #2c3e50;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        /* Container */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        /* Header */
+        .header {
+            background: rgba(255,255,255,0.95);
+            padding: 20px 30px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .back-btn {
+            background: none; border: none; font-size: 24px;
+            cursor: pointer; color: var(--dark);
+        }
+        .page-title { font-size: 24px; font-weight: bold; color: var(--dark); }
+        
+        /* Notification Bell */
+        .notification-bell {
+            position: relative;            font-size: 28px;
+            cursor: pointer;
+        }
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--error);
+            color: white;
+            font-size: 12px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            background: rgba(255,255,255,0.95);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .stat-icon { font-size: 30px; margin-bottom: 10px; }
+        .stat-number { font-size: 24px; font-weight: bold; color: var(--primary); }
+        .stat-label { color: #777; font-size: 12px; }
+        
+        /* Notification List */
+        .notification-card {
+            background: rgba(255,255,255,0.95);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            display: flex;
+            gap: 15px;
+            align-items: flex-start;
+            transition: 0.3s;
+        }
+        .notification-card:hover {            transform: translateX(5px);
+        }
+        .notification-card.unread {
+            border-left: 4px solid var(--primary);
+            background: #f5f0ff;
+        }
+        .notification-card.read {
+            opacity: 0.7;
+        }
+        .notification-icon {
+            font-size: 35px;
+            min-width: 50px;
+            text-align: center;
+        }
+        .notification-content {
+            flex: 1;
+        }
+        .notification-title {
+            font-weight: bold;
+            color: var(--dark);
+            margin-bottom: 5px;
+        }
+        .notification-message {
+            color: #777;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        .notification-time {
+            font-size: 12px;
+            color: #999;
+        }
+        .notification-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .action-btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .btn-mark-read {
+            background: var(--light);
+            color: var(--dark);
+        }
+        .btn-mark-read:hover { background: #ddd; }        .btn-delete {
+            background: var(--error);
+            color: white;
+        }
+        .btn-delete:hover { background: #c0392b; }
+        
+        /* Preferences Section */
+        .preferences-card {
+            background: rgba(255,255,255,0.95);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .section-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--dark);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .preference-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .preference-item:last-child {
+            border-bottom: none;
+        }
+        .preference-info {
+            flex: 1;
+        }
+        .preference-label {
+            font-weight: 500;
+            color: var(--dark);
+            margin-bottom: 5px;
+        }
+        .preference-desc {
+            font-size: 12px;
+            color: #777;
+        }
+        
+        /* Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            width: 60px;            height: 30px;
+        }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.3s;
+            border-radius: 30px;
+        }
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 24px;
+            width: 24px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+        input:checked + .toggle-slider {
+            background-color: var(--success);
+        }
+        input:checked + .toggle-slider:before {
+            transform: translateX(30px);
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: rgba(255,255,255,0.95);
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .empty-icon { font-size: 60px; margin-bottom: 20px; }
+        .empty-title { font-size: 20px; font-weight: bold; color: var(--dark); margin-bottom: 10px; }
+        .empty-text { color: #777; margin-bottom: 20px; }
+        
+        /* Loading */
+        .loading {            text-align: center;
+            padding: 50px;
+            color: white;
+        }
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .notification-card {
+                flex-direction: column;
+            }
+            .notification-actions {
+                width: 100%;
+            }
+            .action-btn {
+                flex: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <button class="back-btn" onclick="goBack()">←</button>
+            <div class="page-title">🔔 Notifications</div>
+            <div class="notification-bell" onclick="markAllRead()">
+                🔔
+                <span class="notification-badge" id="unreadBadge">0</span>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">📬</div>
+                <div class="stat-number" id="totalNotifications">0</div>
+                <div class="stat-label">Total</div>
+            </div>            <div class="stat-card">
+                <div class="stat-icon">📖</div>
+                <div class="stat-number" id="unreadCount">0</div>
+                <div class="stat-label">Unread</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">✅</div>
+                <div class="stat-number" id="readCount">0</div>
+                <div class="stat-label">Read</div>
+            </div>
+        </div>
+
+        <!-- Preferences -->
+        <div class="preferences-card">
+            <div class="section-title">⚙️ Notification Preferences</div>
+            
+            <div class="preference-item">
+                <div class="preference-info">
+                    <div class="preference-label">📱 Push Notifications</div>
+                    <div class="preference-desc">Receive alerts on your device</div>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="pushToggle" onchange="updatePreference('push', this.checked)">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+            
+            <div class="preference-item">
+                <div class="preference-info">
+                    <div class="preference-label">📧 Email Notifications</div>
+                    <div class="preference-desc">Receive updates via email</div>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="emailToggle" onchange="updatePreference('email', this.checked)">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+            
+            <div class="preference-item">
+                <div class="preference-info">
+                    <div class="preference-label">⏰ Daily Reminders</div>
+                    <div class="preference-desc">Get reminded to learn every day</div>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="reminderToggle" onchange="updatePreference('reminder', this.checked)">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+            
+            <div class="preference-item">                <div class="preference-info">
+                    <div class="preference-label">🏆 Achievement Alerts</div>
+                    <div class="preference-desc">Notify when you earn badges</div>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="achievementToggle" onchange="updatePreference('achievement', this.checked)">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+            
+            <div class="preference-item">
+                <div class="preference-info">
+                    <div class="preference-label">🔥 Streak Warnings</div>
+                    <div class="preference-desc">Alert before streak expires</div>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="streakToggle" onchange="updatePreference('streak', this.checked)">
+                    <span class="toggle-slider"></span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Notification List -->
+        <div id="notificationList">
+            <!-- Notifications will be loaded here -->
+        </div>
+
+        <!-- Empty State -->
+        <div class="empty-state hidden" id="emptyState">
+            <div class="empty-icon">🔔</div>
+            <div class="empty-title">No Notifications</div>
+            <div class="empty-text">You're all caught up! Keep learning to earn more.</div>
+        </div>
+
+        <!-- Loading -->
+        <div class="loading hidden" id="loading">
+            <div class="spinner"></div>
+            <p>Loading notifications...</p>
+        </div>
+    </div>
+
+    <script type="module">
+        import { auth, db, doc, getDoc, updateDoc, onAuthStateChanged, collection, addDoc, getDocs, query, orderBy, limit, deleteDoc } from './firebase-config.js';
+
+        let currentUser = null;
+        let notifications = [];
+        let preferences = {};
+
+        // Check Authentication
+        onAuthStateChanged(auth, async (user) => {            if (!user) {
+                window.location.href = "index.html";
+                return;
+            }
+            currentUser = user;
+            await loadNotifications();
+            await loadPreferences();
+            requestNotificationPermission();
+        });
+
+        // Request Notification Permission
+        async function requestNotificationPermission() {
+            if ('Notification' in window) {
+                const permission = await Notification.requestPermission();
+                if (permission === 'granted') {
+                    console.log('Notification permission granted');
+                }
+            }
+        }
+
+        // Load Notifications
+        async function loadNotifications() {
+            showLoading();
+            
+            try {
+                const userDoc = await getDoc(doc(db, "users", currentUser.uid));
+                
+                if (userDoc.exists()) {
+                    notifications = userDoc.data().notifications || [];
+                    displayNotifications();
+                    updateStats();
+                } else {
+                    showEmptyState();
+                }
+                
+            } catch (error) {
+                console.error("Error loading notifications:", error);
+                showEmptyState();
+            }
+        }
+
+        // Load Preferences
+        async function loadPreferences() {
+            try {
+                const userDoc = await getDoc(doc(db, "users", currentUser.uid));
+                if (userDoc.exists()) {
+                    preferences = userDoc.data().notificationPreferences || {
+                        push: true,
+                        email: true,
+                        reminder: true,                        achievement: true,
+                        streak: true
+                    };
+                    updatePreferenceUI();
+                }
+            } catch (error) {
+                console.error("Error loading preferences:", error);
+            }
+        }
+
+        // Update Preference UI
+        function updatePreferenceUI() {
+            document.getElementById('pushToggle').checked = preferences.push;
+            document.getElementById('emailToggle').checked = preferences.email;
+            document.getElementById('reminderToggle').checked = preferences.reminder;
+            document.getElementById('achievementToggle').checked = preferences.achievement;
+            document.getElementById('streakToggle').checked = preferences.streak;
+        }
+
+        // Update Preference
+        window.updatePreference = async function(type, value) {
+            preferences[type] = value;
+            
+            try {
+                await updateDoc(doc(db, "users", currentUser.uid), {
+                    notificationPreferences: preferences
+                });
+                console.log(`Preference ${type} updated to ${value}`);
+            } catch (error) {
+                console.error("Error updating preference:", error);
+            }
+        };
+
+        // Display Notifications
+        function displayNotifications() {
+            const list = document.getElementById("notificationList");
+            const emptyState = document.getElementById("emptyState");
+            
+            list.innerHTML = "";
+            
+            if (notifications.length === 0) {
+                showEmptyState();
+                return;
+            }
+
+            emptyState.classList.add("hidden");
+            document.getElementById("loading").classList.add("hidden");
+
+            // Sort by date (newest first)
+            notifications.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+            notifications.forEach((notif, index) => {
+                const card = document.createElement("div");
+                card.className = "notification-card" + (notif.read ? " read" : " unread");
+                card.innerHTML = `
+                    <div class="notification-icon">${getNotificationIcon(notif.type)}</div>
+                    <div class="notification-content">
+                        <div class="notification-title">${notif.title}</div>
+                        <div class="notification-message">${notif.message}</div>
+                        <div class="notification-time">${formatTime(notif.timestamp)}</div>
+                        <div class="notification-actions">
+                            ${!notif.read ? `<button class="action-btn btn-mark-read" onclick="markAsRead(${index})">✓ Mark Read</button>` : ''}
+                            <button class="action-btn btn-delete" onclick="deleteNotification(${index})">🗑️ Delete</button>
+                        </div>
+                    </div>
+                `;
+                list.appendChild(card);
+            });
+        }
+
+        // Get Notification Icon
+        function getNotificationIcon(type) {
+            const icons = {
+                'achievement': '🏆',
+                'reminder': '⏰',
+                'streak': '🔥',
+                'lesson': '📚',
+                'update': '📢',
+                'general': '🔔'
+            };
+            return icons[type] || icons['general'];
+        }
+
+        // Update Stats
+        function updateStats() {
+            const total = notifications.length;
+            const unread = notifications.filter(n => !n.read).length;
+            const read = total - unread;
+            
+            document.getElementById("totalNotifications").innerText = total;
+            document.getElementById("unreadCount").innerText = unread;
+            document.getElementById("readCount").innerText = read;
+            document.getElementById("unreadBadge").innerText = unread > 9 ? '9+' : unread;
+        }
+
+        // Mark as Read
+        window.markAsRead = async function(index) {
+            notifications[index].read = true;
+            
+            try {                await updateDoc(doc(db, "users", currentUser.uid), {
+                    notifications: notifications
+                });
+                displayNotifications();
+                updateStats();
+            } catch (error) {
+                console.error("Error marking as read:", error);
+            }
+        };
+
+        // Mark All Read
+        window.markAllRead = async function() {
+            notifications.forEach(n => n.read = true);
+            
+            try {
+                await updateDoc(doc(db, "users", currentUser.uid), {
+                    notifications: notifications
+                });
+                displayNotifications();
+                updateStats();
+            } catch (error) {
+                console.error("Error marking all as read:", error);
+            }
+        };
+
+        // Delete Notification
+        window.deleteNotification = async function(index) {
+            notifications.splice(index, 1);
+            
+            try {
+                await updateDoc(doc(db, "users", currentUser.uid), {
+                    notifications: notifications
+                });
+                displayNotifications();
+                updateStats();
+            } catch (error) {
+                console.error("Error deleting notification:", error);
+            }
+        };
+
+        // Format Time
+        function formatTime(timestamp) {
+            if (!timestamp) return "";
+            const date = new Date(timestamp);
+            const now = new Date();
+            const diff = now - date;
+            
+            const minutes = Math.floor(diff / 60000);
+            const hours = Math.floor(diff / 3600000);
+            const days = Math.floor(diff / 86400000);            
+            if (minutes < 1) return "Just now";
+            if (minutes < 60) return `${minutes}m ago`;
+            if (hours < 24) return `${hours}h ago`;
+            if (days < 7) return `${days}d ago`;
+            return date.toLocaleDateString();
+        }
+
+        // Show Loading
+        function showLoading() {
+            document.getElementById("loading").classList.remove("hidden");
+            document.getElementById("notificationList").innerHTML = "";
+            document.getElementById("emptyState").classList.add("hidden");
+        }
+
+        // Show Empty State
+        function showEmptyState() {
+            document.getElementById("loading").classList.add("hidden");
+            document.getElementById("notificationList").innerHTML = "";
+            document.getElementById("emptyState").classList.remove("hidden");
+        }
+
+        // Go Back
+        window.goBack = function() {
+            window.location.href = "dashboard.html";
+        };
+
+        // Export for global access
+        window.loadNotifications = loadNotifications;
+    </script>
+</body>
+</html>

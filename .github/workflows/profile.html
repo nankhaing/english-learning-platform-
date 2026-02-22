@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile - English Learning</title>
+    <style>
+        :root {
+            --primary: #764ba2;
+            --secondary: #667eea;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --error: #e74c3c;
+            --light: #f4f7f6;
+            --dark: #2c3e50;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        /* Container */
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        /* Header */
+        .header {
+            background: rgba(255,255,255,0.95);
+            padding: 20px 30px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .back-btn {
+            background: none; border: none; font-size: 24px;
+            cursor: pointer; color: var(--dark);
+        }
+        .page-title { font-size: 24px; font-weight: bold; color: var(--dark); }
+        .logout-btn {
+            background: var(--error); color: white; border: none;
+            padding: 10px 20px; border-radius: 20px;
+            cursor: pointer; font-weight: bold;        }
+        
+        /* Profile Cards Grid */
+        .profile-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+        }
+        
+        /* Profile Card */
+        .profile-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        /* Avatar */
+        .avatar-container {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 20px;
+        }
+        .avatar {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 5px solid var(--primary);
+            object-fit: cover;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            color: white;
+        }
+        .avatar-edit {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            background: var(--secondary);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;        }
+        
+        /* Username */
+        .username {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--dark);
+            margin-bottom: 5px;
+        }
+        .user-email {
+            color: #777;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+        
+        /* Level Badge */
+        .level-badge {
+            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+            color: white;
+            padding: 10px 25px;
+            border-radius: 25px;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+        
+        /* Edit Button */
+        .edit-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        /* Stats Card */
+        .stats-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-item {
+            background: var(--light);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            border-left: 4px solid var(--primary);
+        }
+        .stat-item.green { border-left-color: var(--success); }
+        .stat-item.orange { border-left-color: var(--warning); }
+        .stat-item.blue { border-left-color: var(--secondary); }
+        .stat-icon { font-size: 30px; margin-bottom: 10px; }
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: var(--dark);
+        }
+        .stat-label {
+            color: #777;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        
+        /* Achievements Section */
+        .section-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--dark);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .achievements-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .achievement-badge {
+            background: var(--light);
+            padding: 15px;
+            border-radius: 15px;
+            text-align: center;
+            transition: 0.3s;
+            opacity: 0.5;        }
+        .achievement-badge.unlocked {
+            opacity: 1;
+            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+            color: white;
+        }
+        .achievement-icon { font-size: 40px; margin-bottom: 10px; }
+        .achievement-name { font-size: 12px; font-weight: bold; }
+        .achievement-desc { font-size: 10px; opacity: 0.8; margin-top: 5px; }
+        
+        /* Learning History */
+        .history-list {
+            background: var(--light);
+            border-radius: 15px;
+            padding: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+        .history-lesson { font-weight: bold; color: var(--dark); }
+        .history-score { 
+            background: var(--success); 
+            color: white; 
+            padding: 5px 15px; 
+            border-radius: 15px; 
+            font-size: 12px;
+        }
+        .history-date { color: #777; font-size: 12px; }
+        
+        /* Goals Section */
+        .goals-container {
+            background: var(--light);
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .goal-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: white;            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+        .goal-checkbox {
+            width: 25px;
+            height: 25px;
+            border: 2px solid var(--primary);
+            border-radius: 5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .goal-checkbox.checked {
+            background: var(--success);
+            border-color: var(--success);
+            color: white;
+        }
+        .goal-text { flex: 1; font-weight: 500; }
+        .goal-progress {
+            width: 100px;
+            height: 8px;
+            background: #eee;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .goal-progress-fill {
+            height: 100%;
+            background: var(--success);
+            border-radius: 4px;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            width: 500px;
+            max-width: 90%;
+        }
+        .modal-header {            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .close-modal {
+            background: none; border: none;
+            font-size: 24px; cursor: pointer; color: #777;
+        }
+        .form-group { margin-bottom: 20px; }
+        .form-group label {
+            display: block; margin-bottom: 8px;
+            font-weight: 500; color: var(--dark);
+        }
+        .form-group input, .form-group select {
+            width: 100%; padding: 12px;
+            border: 2px solid #ddd; border-radius: 10px;
+            font-size: 16px;
+        }
+        .form-group input:focus, .form-group select:focus {
+            outline: none; border-color: var(--primary);
+        }
+        .avatar-options {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .avatar-option {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 3px solid #ddd;
+            cursor: pointer;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--light);
+        }
+        .avatar-option.selected {
+            border-color: var(--primary);
+            background: #f5f0ff;
+        }
+        .save-btn {
+            background: var(--success);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 25px;            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .profile-grid { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: 1fr 1fr; }
+            .header { flex-direction: column; gap: 15px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <button class="back-btn" onclick="goBack()">← Back</button>
+            <div class="page-title">👤 My Profile</div>
+            <button class="logout-btn" onclick="logout()">🚪 Logout</button>
+        </div>
+
+        <!-- Profile Grid -->
+        <div class="profile-grid">
+            <!-- Profile Card -->
+            <div class="profile-card">
+                <div class="avatar-container">
+                    <div class="avatar" id="userAvatar">👤</div>
+                    <button class="avatar-edit" onclick="openAvatarModal()">✏️</button>
+                </div>
+                <div class="username" id="profileUsername">Loading...</div>
+                <div class="user-email" id="profileEmail">...</div>
+                <div class="level-badge" id="levelBadge">Level 1</div>
+                <button class="edit-btn" onclick="openEditModal()">✏️ Edit Profile</button>
+            </div>
+
+            <!-- Stats Card -->
+            <div class="stats-card">
+                <!-- Stats Grid -->
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-icon">📚</div>
+                        <div class="stat-value" id="lessonsCompleted">0</div>
+                        <div class="stat-label">Lessons Completed</div>
+                    </div>
+                    <div class="stat-item green">
+                        <div class="stat-icon">⭐</div>
+                        <div class="stat-value" id="totalXP">0</div>
+                        <div class="stat-label">Total XP</div>
+                    </div>                    <div class="stat-item orange">
+                        <div class="stat-icon">🔥</div>
+                        <div class="stat-value" id="currentStreak">0</div>
+                        <div class="stat-label">Day Streak</div>
+                    </div>
+                    <div class="stat-item blue">
+                        <div class="stat-icon">⏱️</div>
+                        <div class="stat-value" id="timeSpent">0h</div>
+                        <div class="stat-label">Time Spent</div>
+                    </div>
+                </div>
+
+                <!-- Achievements -->
+                <div class="section-title">🏆 Achievements</div>
+                <div class="achievements-grid" id="achievementsGrid">
+                    <!-- Achievements will be loaded here -->
+                </div>
+
+                <!-- Learning History -->
+                <div class="section-title">📚 Learning History</div>
+                <div class="history-list" id="historyList">
+                    <!-- History items will be loaded here -->
+                </div>
+
+                <!-- Daily Goals -->
+                <div class="section-title" style="margin-top: 20px;">🎯 Daily Goals</div>
+                <div class="goals-container">
+                    <div class="goal-item">
+                        <div class="goal-checkbox" id="goal1" onclick="toggleGoal(1)">✓</div>
+                        <div class="goal-text">Complete 1 lesson</div>
+                        <div class="goal-progress">
+                            <div class="goal-progress-fill" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <div class="goal-item">
+                        <div class="goal-checkbox" id="goal2" onclick="toggleGoal(2)">✓</div>
+                        <div class="goal-text">Earn 100 XP</div>
+                        <div class="goal-progress">
+                            <div class="goal-progress-fill" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <div class="goal-item">
+                        <div class="goal-checkbox" id="goal3" onclick="toggleGoal(3)">✓</div>
+                        <div class="goal-text">7-day streak</div>
+                        <div class="goal-progress">
+                            <div class="goal-progress-fill" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>        </div>
+    </div>
+
+    <!-- Edit Profile Modal -->
+    <div class="modal" id="editModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>✏️ Edit Profile</h2>
+                <button class="close-modal" onclick="closeEditModal()">×</button>
+            </div>
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" id="editUsername" placeholder="Your username">
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="editEmail" placeholder="Your email">
+            </div>
+            <button class="save-btn" onclick="saveProfile()">💾 Save Changes</button>
+        </div>
+    </div>
+
+    <!-- Avatar Modal -->
+    <div class="modal" id="avatarModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🖼️ Choose Avatar</h2>
+                <button class="close-modal" onclick="closeAvatarModal()">×</button>
+            </div>
+            <div class="avatar-options" id="avatarOptions">
+                <!-- Avatar options will be loaded here -->
+            </div>
+            <button class="save-btn" onclick="saveAvatar()" style="margin-top: 20px;">💾 Save Avatar</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { auth, db, doc, getDoc, updateDoc, onAuthStateChanged, signOut } from './firebase-config.js';
+
+        // Avatar Options
+        const avatars = ['👤', '🦸', '🦹', '🧑', '👨', '👩', '🧒', '👦', '👧', '🧔', '👴', '👵', '🐱', '🐶', '🦊', '🐼', '🦁', '🐯', '🐸', '🦄'];
+        let selectedAvatar = '👤';
+        let userData = {};
+
+        // Achievements Data
+        const achievements = [
+            { id: 1, icon: '🌟', name: 'First Steps', desc: 'Complete 1 lesson', requirement: 1, unlocked: false },
+            { id: 2, icon: '📚', name: 'Book Worm', desc: 'Complete 10 lessons', requirement: 10, unlocked: false },
+            { id: 3, icon: '🏆', name: 'Champion', desc: 'Complete 25 lessons', requirement: 25, unlocked: false },
+            { id: 4, icon: '🔥', name: 'On Fire', desc: '7-day streak', requirement: 7, unlocked: false },            { id: 5, icon: '⭐', name: 'XP Master', desc: 'Earn 1000 XP', requirement: 1000, unlocked: false },
+            { id: 6, icon: '💎', name: 'Diamond', desc: 'Earn 5000 XP', requirement: 5000, unlocked: false },
+            { id: 7, icon: '🎯', name: 'Perfect', desc: '100% on a lesson', requirement: 1, unlocked: false },
+            { id: 8, icon: '⚡', name: 'Speed Learner', desc: 'Complete 5 lessons in 1 day', requirement: 5, unlocked: false }
+        ];
+
+        // Check Authentication
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                window.location.href = "index.html";
+                return;
+            }
+            await loadUserProfile(user.uid);
+        });
+
+        // Load User Profile
+        async function loadUserProfile(uid) {
+            try {
+                const userDoc = await getDoc(doc(db, "users", uid));
+                if (userDoc.exists()) {
+                    userData = userDoc.data();
+                    displayProfile();
+                } else {
+                    // Create default profile
+                    userData = {
+                        username: "Student",
+                        email: "",
+                        avatar: "👤",
+                        xp: 0,
+                        level: 1,
+                        lessonsCompleted: 0,
+                        streak: 0,
+                        timeSpent: 0,
+                        achievements: [],
+                        history: [],
+                        goals: { 1: false, 2: false, 3: false }
+                    };
+                    await updateDoc(doc(db, "users", uid), userData);
+                    displayProfile();
+                }
+            } catch (error) {
+                console.error("Error loading profile:", error);
+            }
+        }
+
+        // Display Profile
+        function displayProfile() {
+            document.getElementById("profileUsername").innerText = userData.username || "Student";
+            document.getElementById("profileEmail").innerText = userData.email || "Not set";
+            document.getElementById("userAvatar").innerText = userData.avatar || "👤";            document.getElementById("levelBadge").innerText = "Level " + (userData.level || 1);
+            document.getElementById("lessonsCompleted").innerText = userData.lessonsCompleted || 0;
+            document.getElementById("totalXP").innerText = userData.xp || 0;
+            document.getElementById("currentStreak").innerText = userData.streak || 0;
+            document.getElementById("timeSpent").innerText = (userData.timeSpent || 0) + "h";
+
+            // Load Achievements
+            loadAchievements();
+
+            // Load History
+            loadHistory();
+
+            // Load Goals
+            loadGoals();
+        }
+
+        // Load Achievements
+        function loadAchievements() {
+            const grid = document.getElementById("achievementsGrid");
+            grid.innerHTML = "";
+            
+            achievements.forEach(ach => {
+                let unlocked = false;
+                
+                // Check unlock conditions
+                if (ach.id === 1 && (userData.lessonsCompleted || 0) >= 1) unlocked = true;
+                if (ach.id === 2 && (userData.lessonsCompleted || 0) >= 10) unlocked = true;
+                if (ach.id === 3 && (userData.lessonsCompleted || 0) >= 25) unlocked = true;
+                if (ach.id === 4 && (userData.streak || 0) >= 7) unlocked = true;
+                if (ach.id === 5 && (userData.xp || 0) >= 1000) unlocked = true;
+                if (ach.id === 6 && (userData.xp || 0) >= 5000) unlocked = true;
+
+                const div = document.createElement("div");
+                div.className = "achievement-badge" + (unlocked ? " unlocked" : "");
+                div.innerHTML = `
+                    <div class="achievement-icon">${ach.icon}</div>
+                    <div class="achievement-name">${ach.name}</div>
+                    <div class="achievement-desc">${ach.desc}</div>
+                `;
+                grid.appendChild(div);
+            });
+        }
+
+        // Load History
+        function loadHistory() {
+            const list = document.getElementById("historyList");
+            list.innerHTML = "";
+            
+            const history = userData.history || [];
+            if (history.length === 0) {                list.innerHTML = "<p style='text-align:center; color:#777;'>No lessons completed yet</p>";
+                return;
+            }
+
+            history.slice(-10).reverse().forEach(item => {
+                const div = document.createElement("div");
+                div.className = "history-item";
+                div.innerHTML = `
+                    <div>
+                        <div class="history-lesson">${item.lesson}</div>
+                        <div class="history-date">${item.date || 'Recent'}</div>
+                    </div>
+                    <div class="history-score">${item.score || 0}%</div>
+                `;
+                list.appendChild(div);
+            });
+        }
+
+        // Load Goals
+        function loadGoals() {
+            const goals = userData.goals || { 1: false, 2: false, 3: false };
+            for (let i = 1; i <= 3; i++) {
+                const checkbox = document.getElementById("goal" + i);
+                if (goals[i]) {
+                    checkbox.classList.add("checked");
+                } else {
+                    checkbox.classList.remove("checked");
+                }
+            }
+        }
+
+        // Toggle Goal
+        window.toggleGoal = async function(goalNum) {
+            const goals = userData.goals || { 1: false, 2: false, 3: false };
+            goals[goalNum] = !goals[goalNum];
+            
+            const user = auth.currentUser;
+            if (user) {
+                await updateDoc(doc(db, "users", user.uid), { goals });
+                userData.goals = goals;
+                loadGoals();
+            }
+        };
+
+        // Open Edit Modal
+        window.openEditModal = function() {
+            document.getElementById("editUsername").value = userData.username || "";
+            document.getElementById("editEmail").value = userData.email || "";
+            document.getElementById("editModal").style.display = "flex";
+        };
+        // Close Edit Modal
+        window.closeEditModal = function() {
+            document.getElementById("editModal").style.display = "none";
+        };
+
+        // Save Profile
+        window.saveProfile = async function() {
+            const username = document.getElementById("editUsername").value.trim();
+            const email = document.getElementById("editEmail").value.trim();
+            
+            if (!username) {
+                alert("Please enter a username!");
+                return;
+            }
+
+            const user = auth.currentUser;
+            if (user) {
+                await updateDoc(doc(db, "users", user.uid), {
+                    username,
+                    email
+                });
+                userData.username = username;
+                userData.email = email;
+                displayProfile();
+                closeEditModal();
+                alert("✅ Profile updated!");
+            }
+        };
+
+        // Open Avatar Modal
+        window.openAvatarModal = function() {
+            const grid = document.getElementById("avatarOptions");
+            grid.innerHTML = "";
+            
+            avatars.forEach(avatar => {
+                const div = document.createElement("div");
+                div.className = "avatar-option" + (avatar === (userData.avatar || "👤") ? " selected" : "");
+                div.innerText = avatar;
+                div.onclick = () => selectAvatar(avatar, div);
+                grid.appendChild(div);
+            });
+            
+            document.getElementById("avatarModal").style.display = "flex";
+        };
+
+        // Select Avatar
+        function selectAvatar(avatar, element) {
+            selectedAvatar = avatar;
+            document.querySelectorAll(".avatar-option").forEach(el => el.classList.remove("selected"));            element.classList.add("selected");
+        }
+
+        // Close Avatar Modal
+        window.closeAvatarModal = function() {
+            document.getElementById("avatarModal").style.display = "none";
+        };
+
+        // Save Avatar
+        window.saveAvatar = async function() {
+            const user = auth.currentUser;
+            if (user) {
+                await updateDoc(doc(db, "users", user.uid), {
+                    avatar: selectedAvatar
+                });
+                userData.avatar = selectedAvatar;
+                displayProfile();
+                closeAvatarModal();
+                alert("✅ Avatar updated!");
+            }
+        };
+
+        // Logout
+        window.logout = async function() {
+            await signOut(auth);
+            window.location.href = "index.html";
+        };
+
+        // Go Back
+        window.goBack = function() {
+            window.location.href = "dashboard.html";
+        };
+
+        // Close modals on outside click
+        window.onclick = function(event) {
+            if (event.target.className === "modal") {
+                event.target.style.display = "none";
+            }
+        };
+
+        // Export functions for global access
+        window.loadUserProfile = loadUserProfile;
+    </script>
+</body>
+</html>

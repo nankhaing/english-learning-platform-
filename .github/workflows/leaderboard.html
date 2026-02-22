@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaderboard - English Learning</title>
+    <style>
+        :root {
+            --primary: #764ba2;
+            --secondary: #667eea;
+            --gold: #f39c12;
+            --silver: #bdc3c7;
+            --bronze: #cd7f32;
+            --success: #27ae60;
+            --light: #f4f7f6;
+            --dark: #2c3e50;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        /* Container */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        /* Header */
+        .header {
+            background: rgba(255,255,255,0.95);
+            padding: 20px 30px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .back-btn {
+            background: none; border: none; font-size: 24px;
+            cursor: pointer; color: var(--dark);
+        }
+        .page-title { font-size: 24px; font-weight: bold; color: var(--dark); }
+        
+        /* Filter Tabs */
+        .filter-tabs {            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            padding: 10px 0;
+        }
+        .filter-tab {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            white-space: nowrap;
+            transition: 0.3s;
+        }
+        .filter-tab:hover, .filter-tab.active {
+            background: white;
+            color: var(--primary);
+        }
+        
+        /* Category Tabs */
+        .category-tabs {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .category-tab {
+            background: rgba(255,255,255,0.95);
+            border: none;
+            padding: 15px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+            text-align: center;
+        }
+        .category-tab:hover, .category-tab.active {
+            background: var(--gold);
+            color: white;
+            transform: translateY(-2px);
+        }
+        .category-icon { font-size: 24px; display: block; margin-bottom: 5px; }
+        
+        /* Leaderboard Card */
+        .leaderboard-card {
+            background: rgba(255,255,255,0.95);
+            border-radius: 20px;            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        /* Top 3 Podium */
+        .podium {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+            align-items: end;
+        }
+        .podium-item {
+            text-align: center;
+            padding: 20px 10px;
+            border-radius: 15px;
+            position: relative;
+        }
+        .podium-item.first {
+            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%);
+            order: 2;
+            transform: scale(1.1);
+        }
+        .podium-item.second {
+            background: linear-gradient(135deg, #bdc3c7 0%, #95a5a6 100%);
+            order: 1;
+        }
+        .podium-item.third {
+            background: linear-gradient(135deg, #cd7f32 0%, #a05a2c 100%);
+            order: 3;
+        }
+        .podium-avatar {
+            font-size: 50px;
+            margin-bottom: 10px;
+        }
+        .podium-rank {
+            font-size: 40px;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 5px;
+        }
+        .podium-name {
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        .podium-score {
+            color: rgba(255,255,255,0.9);
+            font-size: 12px;        }
+        .podium-crown {
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 30px;
+        }
+        
+        /* Leaderboard List */
+        .leaderboard-list {
+            list-style: none;
+        }
+        .leaderboard-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: var(--light);
+            border-radius: 12px;
+            transition: 0.3s;
+        }
+        .leaderboard-item:hover {
+            transform: translateX(5px);
+            background: #e8ecef;
+        }
+        .leaderboard-item.current-user {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .rank-number {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+            margin-right: 15px;
+        }
+        .rank-1 { background: var(--gold); color: white; }
+        .rank-2 { background: var(--silver); color: white; }
+        .rank-3 { background: var(--bronze); color: white; }
+        .rank-other { background: #ddd; color: #777; }
+        .current-user .rank-number { background: white; color: var(--primary); }
+        
+        .user-avatar {
+            font-size: 35px;
+            margin-right: 15px;        }
+        .user-info {
+            flex: 1;
+        }
+        .user-name {
+            font-weight: bold;
+            color: var(--dark);
+            margin-bottom: 3px;
+        }
+        .current-user .user-name { color: white; }
+        .user-stats {
+            font-size: 12px;
+            color: #777;
+        }
+        .current-user .user-stats { color: rgba(255,255,255,0.8); }
+        .user-score {
+            font-weight: bold;
+            font-size: 18px;
+            color: var(--primary);
+        }
+        .current-user .user-score { color: white; }
+        
+        /* Your Position Card */
+        .your-position {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .your-rank {
+            font-size: 48px;
+            font-weight: bold;
+        }
+        .your-details {
+            flex: 1;
+        }
+        .your-label {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+        .your-name {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }        .your-score {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: white;
+            font-size: 18px;
+        }
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 50px;
+            color: white;
+        }
+        .empty-icon { font-size: 60px; margin-bottom: 20px; }
+        
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .podium {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+            .podium-item.first {
+                order: 1;
+                transform: scale(1);
+            }
+            .podium-item.second {
+                order: 2;
+            }
+            .podium-item.third {
+                order: 3;
+            }
+            .category-tabs {                grid-template-columns: 1fr;
+            }
+            .your-position {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <button class="back-btn" onclick="goBack()">←</button>
+            <div class="page-title">🏆 Leaderboard</div>
+            <div style="width: 24px;"></div>
+        </div>
+
+        <!-- Your Position -->
+        <div class="your-position" id="yourPosition">
+            <div class="your-rank" id="yourRank">-</div>
+            <div class="your-details">
+                <div class="your-label">Your Position</div>
+                <div class="your-name" id="yourName">Loading...</div>
+                <div class="your-score" id="yourScore">0 XP</div>
+            </div>
+        </div>
+
+        <!-- Filter Tabs -->
+        <div class="filter-tabs">
+            <button class="filter-tab active" onclick="setTimeFilter('all')">🌍 All Time</button>
+            <button class="filter-tab" onclick="setTimeFilter('monthly')">📅 Monthly</button>
+            <button class="filter-tab" onclick="setTimeFilter('weekly')">📆 Weekly</button>
+        </div>
+
+        <!-- Category Tabs -->
+        <div class="category-tabs">
+            <button class="category-tab active" onclick="setCategory('xp')">
+                <span class="category-icon">⭐</span>
+                XP
+            </button>
+            <button class="category-tab" onclick="setCategory('lessons')">
+                <span class="category-icon">📚</span>
+                Lessons
+            </button>
+            <button class="category-tab" onclick="setCategory('streak')">
+                <span class="category-icon">🔥</span>
+                Streak
+            </button>
+        </div>
+        <!-- Leaderboard Card -->
+        <div class="leaderboard-card">
+            <!-- Loading -->
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Loading leaderboard...</p>
+            </div>
+
+            <!-- Podium (Top 3) -->
+            <div class="podium hidden" id="podium">
+                <!-- 2nd Place -->
+                <div class="podium-item second" id="podium2">
+                    <div class="podium-crown">🥈</div>
+                    <div class="podium-avatar" id="podium2Avatar">👤</div>
+                    <div class="podium-rank">2</div>
+                    <div class="podium-name" id="podium2Name">-</div>
+                    <div class="podium-score" id="podium2Score">0</div>
+                </div>
+                <!-- 1st Place -->
+                <div class="podium-item first" id="podium1">
+                    <div class="podium-crown">👑</div>
+                    <div class="podium-avatar" id="podium1Avatar">👤</div>
+                    <div class="podium-rank">1</div>
+                    <div class="podium-name" id="podium1Name">-</div>
+                    <div class="podium-score" id="podium1Score">0</div>
+                </div>
+                <!-- 3rd Place -->
+                <div class="podium-item third" id="podium3">
+                    <div class="podium-crown">🥉</div>
+                    <div class="podium-avatar" id="podium3Avatar">👤</div>
+                    <div class="podium-rank">3</div>
+                    <div class="podium-name" id="podium3Name">-</div>
+                    <div class="podium-score" id="podium3Score">0</div>
+                </div>
+            </div>
+
+            <!-- Leaderboard List -->
+            <ul class="leaderboard-list" id="leaderboardList">
+                <!-- Items will be loaded here -->
+            </ul>
+
+            <!-- Empty State -->
+            <div class="empty-state hidden" id="emptyState">
+                <div class="empty-icon">📊</div>
+                <h3>No Rankings Yet</h3>
+                <p>Be the first to complete lessons and earn XP!</p>
+            </div>
+        </div>
+    </div>
+    <script type="module">
+        import { auth, db, collection, getDocs, query, orderBy, limit, onAuthStateChanged, doc, getDoc } from './firebase-config.js';
+
+        let currentUser = null;
+        let currentCategory = 'xp';
+        let currentTimeFilter = 'all';
+        let allUsers = [];
+
+        // Check Authentication
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                window.location.href = "index.html";
+                return;
+            }
+            currentUser = user;
+            await loadLeaderboard();
+        });
+
+        // Load Leaderboard
+        async function loadLeaderboard() {
+            showLoading();
+            
+            try {
+                // Get all users from Firestore
+                const usersRef = collection(db, "users");
+                const usersSnapshot = await getDocs(usersRef);
+                
+                allUsers = [];
+                usersSnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    allUsers.push({
+                        uid: doc.id,
+                        username: data.username || "Anonymous",
+                        avatar: data.avatar || "👤",
+                        xp: data.xp || 0,
+                        lessonsCompleted: data.lessonsCompleted || 0,
+                        streak: data.streak || 0,
+                        email: data.email || ""
+                    });
+                });
+
+                // Sort based on category
+                sortUsers();
+                
+                // Display leaderboard
+                displayLeaderboard();
+                displayYourPosition();
+                
+            } catch (error) {                console.error("Error loading leaderboard:", error);
+                showEmptyState();
+            }
+        }
+
+        // Sort Users
+        function sortUsers() {
+            switch(currentCategory) {
+                case 'xp':
+                    allUsers.sort((a, b) => b.xp - a.xp);
+                    break;
+                case 'lessons':
+                    allUsers.sort((a, b) => b.lessonsCompleted - a.lessonsCompleted);
+                    break;
+                case 'streak':
+                    allUsers.sort((a, b) => b.streak - a.streak);
+                    break;
+            }
+        }
+
+        // Display Leaderboard
+        function displayLeaderboard() {
+            const podium = document.getElementById("podium");
+            const list = document.getElementById("leaderboardList");
+            const emptyState = document.getElementById("emptyState");
+            
+            list.innerHTML = "";
+            
+            if (allUsers.length === 0) {
+                showEmptyState();
+                return;
+            }
+
+            // Show podium for top 3
+            if (allUsers.length >= 1) {
+                podium.classList.remove("hidden");
+                updatePodium(1, allUsers[0]);
+            }
+            if (allUsers.length >= 2) {
+                updatePodium(2, allUsers[1]);
+            }
+            if (allUsers.length >= 3) {
+                updatePodium(3, allUsers[2]);
+            }
+
+            // Display list (starting from 4th place)
+            const listUsers = allUsers.slice(3);
+            listUsers.forEach((user, index) => {
+                const rank = index + 4;
+                const isCurrentUser = user.uid === currentUser.uid;                const score = getScore(user);
+                
+                const li = document.createElement("li");
+                li.className = "leaderboard-item" + (isCurrentUser ? " current-user" : "");
+                li.innerHTML = `
+                    <div class="rank-number rank-other">${rank}</div>
+                    <div class="user-avatar">${user.avatar}</div>
+                    <div class="user-info">
+                        <div class="user-name">${user.username}</div>
+                        <div class="user-stats">${getStatsText(user)}</div>
+                    </div>
+                    <div class="user-score">${score}</div>
+                `;
+                list.appendChild(li);
+            });
+
+            // Hide loading
+            document.getElementById("loading").classList.add("hidden");
+        }
+
+        // Update Podium
+        function updatePodium(position, user) {
+            const podiumItem = document.getElementById(`podium${position}`);
+            const score = getScore(user);
+            
+            document.getElementById(`podium${position}Avatar`).innerText = user.avatar;
+            document.getElementById(`podium${position}Name`).innerText = user.username;
+            document.getElementById(`podium${position}Score`).innerText = score;
+        }
+
+        // Get Score Based on Category
+        function getScore(user) {
+            switch(currentCategory) {
+                case 'xp': return user.xp + " XP";
+                case 'lessons': return user.lessonsCompleted + " Lessons";
+                case 'streak': return user.streak + " Days";
+                default: return user.xp + " XP";
+            }
+        }
+
+        // Get Stats Text
+        function getStatsText(user) {
+            return `${user.lessonsCompleted} lessons • ${user.streak} day streak`;
+        }
+
+        // Display Your Position
+        function displayYourPosition() {
+            if (!currentUser) return;
+            
+            const userIndex = allUsers.findIndex(u => u.uid === currentUser.uid);            const user = allUsers[userIndex];
+            
+            if (user) {
+                document.getElementById("yourRank").innerText = "#" + (userIndex + 1);
+                document.getElementById("yourName").innerText = user.username;
+                document.getElementById("yourScore").innerText = getScore(user);
+            } else {
+                document.getElementById("yourRank").innerText = "-";
+                document.getElementById("yourName").innerText = "Loading...";
+                document.getElementById("yourScore").innerText = "0";
+            }
+        }
+
+        // Show Loading
+        function showLoading() {
+            document.getElementById("loading").classList.remove("hidden");
+            document.getElementById("podium").classList.add("hidden");
+            document.getElementById("leaderboardList").innerHTML = "";
+            document.getElementById("emptyState").classList.add("hidden");
+        }
+
+        // Show Empty State
+        function showEmptyState() {
+            document.getElementById("loading").classList.add("hidden");
+            document.getElementById("podium").classList.add("hidden");
+            document.getElementById("emptyState").classList.remove("hidden");
+        }
+
+        // Set Category
+        window.setCategory = function(category) {
+            currentCategory = category;
+            
+            // Update active tab
+            document.querySelectorAll(".category-tab").forEach(tab => {
+                tab.classList.remove("active");
+            });
+            event.target.closest(".category-tab").classList.add("active");
+            
+            // Reload leaderboard
+            loadLeaderboard();
+        };
+
+        // Set Time Filter
+        window.setTimeFilter = function(filter) {
+            currentTimeFilter = filter;
+            
+            // Update active tab
+            document.querySelectorAll(".filter-tab").forEach(tab => {
+                tab.classList.remove("active");
+            });            event.target.classList.add("active");
+            
+            // In real app, filter by date here
+            // For now, just reload
+            loadLeaderboard();
+        };
+
+        // Go Back
+        window.goBack = function() {
+            window.location.href = "dashboard.html";
+        };
+
+        // Export for global access
+        window.loadLeaderboard = loadLeaderboard;
+    </script>
+</body>
+</html>
